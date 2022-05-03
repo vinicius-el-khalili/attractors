@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strange Attractors</title>
+</head>
+
+<body>
+    <div class="box" id="box" onclick="whatever()">
+        <div class="point" id="point"></div>
+    </div>
+    <div class="box" id="numberbox"></div>
+</body>
+
+</html>
+<style>
+    body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-family: 'Courier New', Courier, monospace;
+    }
+
+    .box {
+        height: 80vh;
+        width: 50vw;
+        border: 1px solid black;
+    }
+
+    .point {
+        position: relative;
+        top: 12px;
+        left: 100px;
+        height: 10px;
+        width: 10px;
+        border: 1px solid black;
+        border-radius: 50%;
+        stroke: tomato;
+        stroke-dasharray: 1000;
+        stroke-dashoffset: 1000;
+        animation: dash 5s linear alternate infinite;
+    }
+</style>
+<script>
+    var dt = 0.01;
+    var t = 0;
+    var tmax = 1.0;
+    var offset = [200, 200, 25];
+    var id = null;
+    class point {
+        constructor(x, y, z, s, p, b, id) {
+            this.r = [x, y, z];
+            this.v = [0, 0, 0];
+            this.s = s;
+            this.p = p;
+            this.b = b;
+            this.id = id;
+        }
+        update() {
+            this.v[0] = this.s * (this.r[1] - this.r[0]);
+            this.v[1] = this.r[0] * (this.p - this.r[2]) - this.r[1];
+            this.v[2] = this.r[0] * this.r[1] - this.b * this.r[2];
+            this.r[0] += this.v[0] * dt;
+            this.r[1] += this.v[1] * dt;
+            this.r[2] += this.v[2] * dt;
+        }
+    }
+    function whatever() {
+        let p = new point(0, 2, 20, 10, 28, 2.66, "point");
+        t = 0;
+        clearInterval(id);
+        id = setInterval(frame, 10);
+        function frame() {
+            if (t > 100) {
+                clearInterval(id);
+            } else {
+                document.getElementById("point").style.top = (p.r[0] * 10 + offset[0]).toString() + "px";
+                document.getElementById("point").style.left = (p.r[1] * 10 + offset[1]).toString() + "px";
+                document.getElementById("numberbox").innerHTML = p.r;
+                p.update();
+                t += dt;
+                draw();
+            }
+        }
+        function draw() {
+            const canvas = document.querySelector("box");
+            if (!canvas.getContext) {
+                return;
+            }
+            const ctx = canvas.getContext('2d');
+            // set line stroke and line width
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = 5;
+            // draw a red line
+            ctx.beginPath();
+            ctx.moveTo(100, 100);
+            ctx.lineTo(300, 100);
+            ctx.stroke();
+        }
+    }
+</script>
