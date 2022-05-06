@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>canvas setup</title>
+</head>
+
+<body>
+    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Blanditiis, quam?</p>
+    <canvas></canvas>
+</body>
+
+</html>
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    html {
+        width: 100%;
+        height: 100%;
+    }
+
+    body {
+        display: grid;
+        justify-items: center;
+        align-content: space-around;
+        background-color: #202830;
+        color: #ffff;
+        font-size: 1.25em;
+        min-height: 100%;
+        width: 100%;
+    }
+
+    p {
+        text-align: center;
+    }
+</style>
+
+
+<script type="text/javascript">
+    var context = document.querySelector("canvas").getContext("2d");
+    var render = function () {
+        context.canvas.width = document.documentElement.clientWidth * 0.5;
+        context.canvas.height = document.documentElement.clientHeight * 0.5;
+        context.fillStyle = "#008000";
+        context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+    }
+    render();
+    window.addEventListener("resize", render)
+</script>
