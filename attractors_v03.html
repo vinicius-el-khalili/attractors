@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+    <div class="container">
+        <!-- navigation bar -->
+        <div class="navbar">
+            <img src="https://attractors.readthedocs.io/en/latest/_static/icon.png" class="logo-icon">
+            <nav>
+                <ul id="nav ul">
+                    <li>Home</li>
+                    <li onclick="simulation(new Lorenz);">Lorenz attractor</li>
+                    <li onclick="simulation(new Chen);">Chen attractor</li>
+                    <li onclick="balita();">Aizawa attactor</li>
+                    <li>About</li>
+                </ul>
+            </nav>
+            <img src="https://icon-library.com/images/white-menu-icon-png/white-menu-icon-png-18.jpg" class="menu-icon"
+                onclick="toggleMenu();">
+        </div>
+        <!-- canvas -->
+        <canvas></canvas>
+    </div>
+
+</body>
+
+</html>
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Nunito Sans', sans-serif;
+        font-size: 16px;
+    }
+
+    html {
+        width: 100%;
+        height: 100%;
+    }
+
+    body {
+        display: grid;
+        justify-items: center;
+        align-items: center;
+        min-height: 100%;
+        width: 100%;
+
+    }
+
+    .container {
+        background-color: black;
+        width: 100%;
+        min-height: 100vh;
+        padding-left: 4%;
+        padding-right: 4%;
+        overflow: hidden;
+    }
+
+
+    .navbar {
+        margin-top: 25px;
+        padding-left: 20px;
+        padding-right: 40px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        background-color: #191919;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+
+    .logo-icon {
+        height: 35px;
+        margin-left: 10px;
+        background-color: #191919;
+        display: block;
+    }
+
+    .menu-icon {
+        height: 50px;
+        margin-right: 10px;
+        background-color: #191919;
+        display: none;
+        cursor: pointer;
+    }
+
+
+    nav {
+        display: flex;
+        flex-direction: row;
+        flex: 1;
+        align-items: center;
+        justify-content: right;
+        height: 50px;
+    }
+
+    nav ul li {
+        height: 50px;
+        color: white;
+        list-style: none;
+        display: inline-block;
+        padding-top: 15px;
+        padding-right: 10px;
+        padding-left: 10px;
+        padding-bottom: 10px;
+        cursor: pointer;
+    }
+
+    nav ul li:hover {
+        background-color: white;
+        color: black;
+    }
+
+
+    button {
+        width: auto;
+        padding-left: 12px;
+        padding-right: 12px;
+        padding-top: 2px;
+        padding-bottom: 2px;
+        height: auto;
+        background-color: cornflowerblue;
+        cursor: pointer;
+    }
+
+    button:hover {
+        border: 1px solid black;
+    }
+
+    @media only screen and (max-width:800px) {
+        .container{
+            padding: 0;
+        }
+        .navbar {
+            padding-left: 15px;
+            padding-right: 5px;
+            margin-top: 0;
+            border-radius: 0;
+        }
+
+        nav ul {
+            position: absolute;
+            top: 50px;
+            left: 0;
+            width: 100%;
+            background-color: #191919;
+            z-index: 2;
+            display: none;  
+        }
+
+        nav ul li {
+            text-align: right;
+            padding-right: 30px;
+        }
+
+        .menu-icon {
+            display: block;
+        }
+
+        nav ul li {
+            display: block;
+        }
+
+        nav ul li a {
+            color: #fff
+        }
+
+    }
+</style>
+
+<script type="text/javascript">
+    /* --- VARIABLES*/
+    var dt = 0.005;
+    /* --- SET UP*/
+    const context = document.querySelector("canvas").getContext("2d");
+    /* --- USEFUL FUNCTIONS*/
+    function random(min, max) {
+        return Math.floor(Math.random() * (max - min)) + min;
+    }
+    function randomColor() {
+        return 'rgb(' +
+            random(0, 255) + ', ' +
+            random(0, 255) + ', ' +
+            random(0, 255) + ')';
+    }
+    /* --- BALLS*/
+    function Ball(x, y, z, attractor) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.color = randomColor();
+        this.size = 2;
+        this.attractor = attractor;
+        this.settings = attractor.settings
+    }
+    Ball.prototype.draw = function () {
+        context.beginPath();
+        context.fillStyle = this.color;
+        let R = [this.x, this.y, this.z];
+        context.arc(this.settings.zoom * R[this.settings.axis[0]] + context.canvas.width / 2 + this.settings.offset[0], this.settings.zoom * R[this.settings.axis[1]] + context.canvas.height / 2 + this.settings.offset[1], this.size, 0, 2 * Math.PI);
+        context.fill();
+    }
+    Ball.prototype.update = function () {
+        this.x += this.attractor.fx(this.x, this.y, this.z) * dt;
+        this.y += this.attractor.fy(this.x, this.y, this.z) * dt;
+        this.z += this.attractor.fz(this.x, this.y, this.z) * dt;
+    }
+    /* --- ATTRACTORS*/
+    class settings {
+        constructor(zoom, offset, time_step, spawn_range, axis) {
+            this.zoom = zoom;               /* float;       zoom objects in relation to canvas */
+            this.offset = offset;           /* list[2];     translate objects in relation to canvas */
+            this.time_step = time_step;     /* float;       dt */
+            this.spawn_range = spawn_range; /* list[3];     { (x,y,z) | x in [-a,a], y in [-b,b], z in [-c,c] } */
+            this.axis = axis;               /* list[2];     the two axis used for 2D projection on canvas {0:x,1:y,2:z} */
+        }
+    }
+    class Lorenz {
+        constructor() {
+            this.sigma = 10;
+            this.rho = 28;
+            this.beta = 2.66;
+            this.settings = new settings(10, [10, 0], 0.01, [40, 40, 40], [0, 1]);
+        }
+        fx(x, y, z) {
+            return this.sigma * (y - x);
+        }
+        fy(x, y, z) {
+            return x * (this.rho - z) - y;
+        }
+        fz(x, y, z) {
+            return x * y - this.beta * z;
+        }
+    }
+    class Thomas {
+        constructor() {
+            this.beta = 1.998;
+        }
+        fx(x, y, z) {
+            return -this.beta * x + Math.sin(y);
+        }
+        fy(x, y, z) {
+            return -this.beta * y + Math.sin(z);
+        }
+        fz(x, y, z) {
+            return -this.beta * z + Math.sin(x);
+        }
+    }
+    class Aizawa {
+        constructor() {
+            this.a = 0.95;
+            this.b = 0.70;
+            this.c = 0.60;
+            this.d = 3.50;
+            this.e = 0.25;
+            this.f = 0.10;
+        }
+        fx(x, y, z) {
+            return (z - this.b) * x - this.d * y;
+        }
+        fy(x, y, z) {
+            return this.d * x + (z - this.b) * y;
+        }
+        fz(x, y, z) {
+            return this.c + this.a * z - (z ** 3) / 3 - x ** 2 + this.f * z * (x ** 3);
+        }
+    }
+    class Chen {
+        constructor() {
+            this.a = 40;
+            this.c = 28;
+            this.b = 3;
+            this.settings = new settings(8, [0, -context.canvas.height / 5], 0.005, [10, 10, 10], [1, 2]);
+        }
+        fx(x, y, z) {
+            return this.a * (y - x);
+        }
+        fy(x, y, z) {
+            return (this.c - this.a) * x - x * z + this.c * y;
+        }
+        fz(x, y, z) {
+            return x * y - this.b * z;
+        }
+    }
+    /*RESIZE*/
+    var resize = function () {
+        if (document.documentElement.clientWidth>800){
+            document.getElementById("nav ul").style.display = "block";
+            context.canvas.width = document.documentElement.clientWidth * 0.92;
+            context.canvas.height = document.documentElement.clientHeight * 0.84;
+        }
+        if (document.documentElement.clientWidth<=800){
+            document.getElementById("nav ul").style.display = "none";
+            context.canvas.width = document.documentElement.clientWidth;
+            context.canvas.height = document.documentElement.clientHeight * 0.875;
+        }    
+    }
+    var toggleMenu = function () {
+        var menulist = document.getElementById("nav ul");
+        var display = menulist.style.display;
+        if (display == "" || display == "none") {
+            menulist.style.display = "block";
+        }
+        else {
+            menulist.style.display = "none";
+        }
+    }
+    resize();
+    window.addEventListener("resize", resize);
+    /* OK HERE WE GO */
+    function generate_balls(n,A){
+        let balls = [];
+        while (balls.length < n) {
+            let ball = new Ball(
+                random(-A.settings.spawn_range[0], A.settings.spawn_range[0]),
+                random(-A.settings.spawn_range[1], A.settings.spawn_range[1]),
+                random(-A.settings.spawn_range[2], A.settings.spawn_range[2]), A)
+            balls.push(ball);
+        }
+        return balls;
+    }
+    var globalID;
+    function loop() {
+        if (globalID){
+            window.cancelAnimationFrame(globalID);
+        }
+        context.fillStyle = 'rgba(0, 0, 0,0.1)';
+        context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+        for (let i = 0; i < balls.length; i++) {
+            balls[i].draw();
+            balls[i].update();
+        }
+        global_ID=window.requestAnimationFrame(loop);
+    }
+    function simulation(A){
+        balls=generate_balls(150,A);
+        loop();
+    }
+    function balita(){
+        alert("hi");
+}
+</script>
