@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+    <div class="container">
+        <!-- navigation bar -->
+        <div class="navbar">
+            <img src="https://attractors.readthedocs.io/en/latest/_static/icon.png" class="logo-icon">
+            <nav>
+                <ul id="nav ul">
+                    <li>Home</li>
+                    <li>Lorenz attractor</li>
+                    <li>Chen attractor</li>
+                    <li>Aizawa attactor</li>
+                    <li>About</li>
+                </ul>
+            </nav>
+            <img src="https://icon-library.com/images/white-menu-icon-png/white-menu-icon-png-18.jpg" class="menu-icon"
+                onclick="toggleMenu();">
+        </div>
+        <!-- canvas -->
+        <canvas></canvas>
+    </div>
+
+</body>
+
+</html>
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Nunito Sans', sans-serif;
+        font-size: 16px;
+    }
+
+    html {
+        width: 100%;
+        height: 100%;
+    }
+
+    body {
+        display: grid;
+        justify-items: center;
+        align-items: center;
+        min-height: 100%;
+        width: 100%;
+
+    }
+
+    .container {
+        background-color: black;
+        width: 100%;
+        min-height: 100vh;
+        padding-left: 8%;
+        padding-right: 8%;
+        overflow: hidden;
+    }
+
+
+    .navbar {
+        margin-top: 25px;
+        padding-left: 20px;
+        padding-right: 40px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        background-color: #191919;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+
+    .logo-icon {
+        height: 35px;
+        margin-left: 10px;
+        background-color: #191919;
+        display: block;
+    }
+
+    .menu-icon {
+        height: 50px;
+        margin-right: 10px;
+        background-color: #191919;
+        display: none;
+        cursor: pointer;
+    }
+
+
+    nav {
+        display: flex;
+        flex-direction: row;
+        flex: 1;
+        align-items: center;
+        justify-content: right;
+        height: 50px;
+    }
+
+    nav ul li {
+        height: 50px;
+        color: white;
+        list-style: none;
+        display: inline-block;
+        padding-top: 15px;
+        padding-right: 10px;
+        padding-left: 10px;
+        padding-bottom: 10px;
+        cursor: pointer;
+    }
+
+    nav ul li:hover {
+        background-color: white;
+        color: black;
+    }
+
+
+    button {
+        width: auto;
+        padding-left: 12px;
+        padding-right: 12px;
+        padding-top: 2px;
+        padding-bottom: 2px;
+        height: auto;
+        background-color: cornflowerblue;
+        cursor: pointer;
+    }
+
+    button:hover {
+        border: 1px solid black;
+    }
+
+    @media only screen and (max-width:800px) {
+        .navbar {
+            padding-left: 15px;
+            padding-right: 5px;
+        }
+
+        nav ul {
+            position: absolute;
+            top: 75px;
+            left: 8%;
+            width: 84%;
+            background-color: #191919;
+            z-index: 2;
+            display: none;
+        }
+
+        nav ul li {
+            text-align: right;
+            padding-right: 30px;
+        }
+
+        .menu-icon {
+            display: block;
+        }
+
+        nav ul li {
+            display: block;
+        }
+
+        nav ul li a {
+            color: #fff
+        }
+
+    }
+
+    @media only screen and (min-width:801px) {
+        nav ul {
+            display: block;
+        }
+    }
+</style>
+
+<script>
+    var context = document.querySelector("canvas").getContext("2d");
+    var render = function () {
+        context.canvas.width = document.documentElement.clientWidth * 0.84;
+        context.canvas.height = document.documentElement.clientHeight * 0.84;
+        context.fillStyle = "#fff";
+        context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+    }
+    var toggleMenu = function () {
+        var menulist = document.getElementById("nav ul");
+        var display = menulist.style.display;
+        if (display == "" || display == "none") {
+            menulist.style.display = "block";
+        }
+        else {
+            menulist.style.display = "none";
+        }
+    }
+
+    render();
+    window.addEventListener("resize", render)
+</script>
